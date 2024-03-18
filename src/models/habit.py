@@ -43,3 +43,5 @@ class Habit:
     def set_periodicity(self, periodicity):
         self.periodicity = periodicity
     
+    def __str__(self):
+        return f"Habit ID: {self.habit_id}\nName: {self.name}\nPeriodicity: {self.periodicity}\nCreation Date: {self.creation_date}\nCurrent Streak: {self.current_streak}\nLongest Streak: {self.longest_streak}\nCompletion Dates: {self.completion_history}\n"

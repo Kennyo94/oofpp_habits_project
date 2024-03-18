@@ -19,6 +19,11 @@ class DBConnection:
         cursor.execute(query, params)
         return cursor
     
+    def get_last_row_id(self):
+        self.connect()
+        cursor = self.connection.cursor()
+        return cursor.lastrowid
+    
     def commit_query(self):
         self.connection.commit()
         self.disconnect()

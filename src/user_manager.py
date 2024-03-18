@@ -85,10 +85,3 @@ class UserManager:
         
 
 
-
-
-db = DBConnection("../db/habit_tracker.db")
-
-manager = UserManager(db)
-
-print(manager.get_users())
