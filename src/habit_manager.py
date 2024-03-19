@@ -97,8 +97,10 @@ class HabitManager:
         completion_dates = habit.get_completion_history()
 
         habit_to_be_added = self.get_habit_by_name(name)
+        habit_user_id = self.db.execute_query("SELECT user_id FROM Habits WHERE name = ? AND periodicity = ? AND creation_date = ? AND current_streak = ? AND longest_streak = ?", (name, periodicity, creation_date, current_streak, longest_streak, )).fetchone()
 
-        if habit_to_be_added is None:
+
+        if habit_to_be_added is None or (user_id is not habit_user_id and habit_to_be_added is not None):
             query = "INSERT INTO Habits (user_id, name, periodicity, creation_date, current_streak, longest_streak) VALUES (?, ?, ?, ?, ?, ?)"
             self.db.execute_query(query, (user_id, name, periodicity, creation_date, current_streak, longest_streak))
             self.db.commit_query()
@@ -134,9 +136,8 @@ class HabitManager:
     def update_habit_name(self, habit_id, new_name):
 
         habit_to_be_updated = self.get_habit_by_id(habit_id)
-        habit_check = self.get_habit_by_name(new_name)
 
-        if habit_to_be_updated is not None and habit_check is None:
+        if habit_to_be_updated is not None:
             query = "UPDATE Habits SET name = ? WHERE habit_id = ?"
             self.db.execute_query(query, (new_name, habit_id, ))
             self.db.commit_query()
@@ -145,9 +146,7 @@ class HabitManager:
         if habit_to_be_updated is None:
             raise HabitNotFoundException(habit_id)
         
-        if habit_check is not None:
-            raise HabitAlreadyExistsException(new_name)
-
+       
 
     def update_habit_periodicity(self, habit_id, periodicity):
 
@@ -222,18 +221,6 @@ class HabitManager:
 
         
 
-
-        
-    
-
-
 db = DBConnection("../db/habit_tracker.db")
-
 h_manager = HabitManager(db)
-
-habit = Habit("Cooking", "daily", completion_history=["2024-03-01","2024-03-02", "2024-03-03"], current_streak=0, longest_streak=3)
-
-
-
-
-h_manager.get_habit_by_id(100)
+print(h_manager.get_habits())
