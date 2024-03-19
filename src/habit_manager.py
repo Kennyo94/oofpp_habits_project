@@ -1,5 +1,7 @@
 from models.habit import Habit
 from db_connection import DBConnection
+from datetime import datetime, timedelta
+from exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
 
 
 class HabitManager:
@@ -35,7 +37,9 @@ class HabitManager:
             completion_dates = [str(dates[0]) for dates in cd]
             return Habit(result[2], result[3], result[0], result[4], completion_dates, result[5], result[6])
 
-        return None
+        else:
+            raise HabitNotFoundException(habit_id)
+
     
     def get_habit_by_name(self, name):
         query = "SELECT * FROM Habits WHERE name = ?"
@@ -46,8 +50,10 @@ class HabitManager:
             cd = self.db.execute_query(completion_query, (result[0], )).fetchall()
             completion_dates = [str(dates[0]) for dates in cd]
             return Habit(result[2], result[3], result[0], result[4], completion_dates, result[5], result[6])
+        
+        else:
+            raise HabitNotFoundException("-")
 
-        return None
     
 
     def get_habits_from_user(self, user_id):
@@ -76,8 +82,9 @@ class HabitManager:
             cd = self.db.execute_query(completion_query, (result[0], )).fetchall()
             completion_dates = [str(dates[0]) for dates in cd]
             return Habit(result[2], result[3], result[0], result[4], completion_dates, result[5], result[6])
-
-        return None
+        else:
+            raise HabitNotFoundException(habit_id)
+        
 
 
     def add_habit(self, habit: Habit, user_id):
@@ -98,14 +105,13 @@ class HabitManager:
 
             habit_query = "SELECT habit_id FROM Habits WHERE user_id = ? AND name = ? AND periodicity = ? AND creation_date = ? AND current_streak = ? AND longest_streak = ?"
             habit_id = self.db.execute_query(habit_query, (user_id, name, periodicity, creation_date, current_streak, longest_streak)).fetchone()[0]
-            print(habit_id)
 
             for date in completion_dates:
                 query = "INSERT INTO CompletionDates (habit_id, completion_date) VALUES (?, ?)"
                 self.db.execute_query(query, (habit_id, date))
                 self.db.commit_query()
         else:
-            raise ValueError("Habit Already Exists!")
+            raise HabitAlreadyExistsException(name)
 
 
 
@@ -122,10 +128,102 @@ class HabitManager:
             return habit_to_be_deleted
 
         else:
-            raise ValueError("Habit Not Found!")
+            raise HabitNotFoundException(habit_id)
+        
+
+    def update_habit_name(self, habit_id, new_name):
+
+        habit_to_be_updated = self.get_habit_by_id(habit_id)
+        habit_check = self.get_habit_by_name(new_name)
+
+        if habit_to_be_updated is not None and habit_check is None:
+            query = "UPDATE Habits SET name = ? WHERE habit_id = ?"
+            self.db.execute_query(query, (new_name, habit_id, ))
+            self.db.commit_query()
+            return
+
+        if habit_to_be_updated is None:
+            raise HabitNotFoundException(habit_id)
+        
+        if habit_check is not None:
+            raise HabitAlreadyExistsException(new_name)
+
+
+    def update_habit_periodicity(self, habit_id, periodicity):
+
+            habit_to_be_updated = self.get_habit_by_id(habit_id)
+
+            if habit_to_be_updated is not None:
+                query = "UPDATE Habits SET periodicity = ? WHERE habit_id = ?"
+                self.db.execute_query(query, (periodicity, habit_id, ))
+                self.db.commit_query()
+                return
+
+            if habit_to_be_updated is None:
+                raise HabitNotFoundException(habit_id)
+            
+
+    def update_streak(self, habit_id, new_current, new_longest):
+        query = "UPDATE Habits SET current_streak = ?, longest_streak = ? WHERE habit_id = ?"
+        self.db.execute_query(query, (new_current, new_longest, habit_id, ))
+        self.db.commit_query()
+
+            
+
+
+    def complete_habit(self, habit_id, date):
+        habit_to_be_completed = self.get_habit_by_id(habit_id)
+
+        if habit_to_be_completed is not None:
+            if len(habit_to_be_completed.get_completion_history()) == 0:
+                new_current = 1
+                new_longest = max(new_current, habit_to_be_completed.get_longest_streak())
+                self.update_streak(habit_id, 1, 1)
+            else:
+
+                last_completion_date = datetime.strptime(habit_to_be_completed.get_completion_history()[-1], "%Y-%m-%d")
+                current_completion_date = datetime.strptime(str(date)[:10], "%Y-%m-%d")
+
+                if habit_to_be_completed.get_periodicity() == "daily":
+                    if current_completion_date - last_completion_date == timedelta(days=1):
+                        new_current = habit_to_be_completed.get_current_streak() + 1
+                        new_longest = max(new_current, habit_to_be_completed.get_longest_streak())
+                        self.update_streak(habit_id, new_current, new_longest)
+                    else:
+                        self.update_streak(habit_id, 1, max(1, habit_to_be_completed.get_longest_streak()))
+
+                elif self.periodicity == "weekly":
+
+                    next_week_start = last_completion_date + timedelta(days=(7 - last_completion_date.weekday()))
+                    next_week_end = next_week_start + timedelta(days=6)
+
+                    if current_completion_date >= next_week_start and current_completion_date <= next_week_end:
+                        new_current = habit_to_be_completed.get_current_streak() + 1
+                        new_longest = max(new_current, habit_to_be_completed.get_longest_streak())
+                        self.update_streak(habit_id, new_current, new_longest)
+
+                    else:
+                        self.update_streak(habit_id, 1, max(1, habit_to_be_completed.get_longest_streak()))
+
+                else:
+                    raise InvalidPeriodicityException(habit_to_be_completed.get_periodicity())
+                
+            query = "INSERT INTO CompletionDates (habit_id, completion_date) VALUES (?,?)"
+            date_to_be_inserted = str(date)[:10]
+            self.db.execute_query(query, (habit_id, date_to_be_inserted, ))
+            self.db.commit_query()
+        
+        else:
+            raise HabitNotFoundException(habit_id)
+
+
+
+
+
         
 
 
+        
     
 
 
@@ -136,4 +234,6 @@ h_manager = HabitManager(db)
 habit = Habit("Cooking", "daily", completion_history=["2024-03-01","2024-03-02", "2024-03-03"], current_streak=0, longest_streak=3)
 
 
-h_manager.delete_habit(51)
+
+
+h_manager.get_habit_by_id(100)

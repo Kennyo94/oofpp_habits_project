@@ -1,6 +1,7 @@
 from models.user import User
 from db_connection import DBConnection
 from datetime import datetime 
+from exceptions import UserNotFoundException, UsernameAlreadyExistsException, UserAlreadyExistsException
 
 
 class UserManager:
@@ -21,12 +22,18 @@ class UserManager:
         result = self.db.execute_query(query, (username, )).fetchone()
         if result is not None:
             return User(result[1], result[0], result[2])
+        else:
+            raise UserNotFoundException("-")
 
     
     def get_user_by_id(self, user_id):
         query = "SELECT * FROM Users WHERE user_id = ?"
         result = self.db.execute_query(query, (user_id, )).fetchone()
-        return User(result[1], result[0], result[2])
+        if result is not None:
+            return User(result[1], result[0], result[2])
+        else:
+            raise UserNotFoundException(user_id)
+    
     
 
     def create_user(self, username):
@@ -37,8 +44,7 @@ class UserManager:
             self.db.execute_query(query, (username, str(datetime.now())[:10])) 
             self.db.commit_query()
         else:
-            print(user_to_be_added)
-            raise ValueError("Username Already Exists!")
+            raise UsernameAlreadyExistsException(username)
         
     def import_user(self, user):
         query_check = "SELECT * FROM Users WHERE username = ?"
@@ -48,8 +54,7 @@ class UserManager:
             self.db.execute_query(query, (user.get_username(), user.get_created_at())) 
             self.db.commit_query()
         else:
-            print(user_to_be_added)
-            raise ValueError("User Already Exists!")
+            raise UserAlreadyExistsException(user.get_username())
     
     def delete_user_by_username(self, username):
         query_check = "SELECT * FROM Users WHERE username = ?"
@@ -61,7 +66,7 @@ class UserManager:
             return "SUCCESS"
         else:
             print(user_to_be_deleted)
-            raise ValueError("User not Found")
+            raise UserNotFoundException(user_to_be_deleted[0])
 
     def delete_user_by_id(self, user_id):
         query_check = "SELECT * FROM Users WHERE user_id = ?"
@@ -73,7 +78,7 @@ class UserManager:
             return "SUCCESS"
         else:
             print(user_to_be_deleted)
-            raise ValueError("User not Found")
+            raise UserNotFoundException(user_id)
         
 
     
