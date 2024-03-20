@@ -167,7 +167,6 @@ class HabitManager:
         self.db.execute_query(query, (new_current, new_longest, habit_id, ))
         self.db.commit_query()
 
-            
 
 
     def complete_habit(self, habit_id, date):
@@ -191,7 +190,7 @@ class HabitManager:
                     else:
                         self.update_streak(habit_id, 1, max(1, habit_to_be_completed.get_longest_streak()))
 
-                elif self.periodicity == "weekly":
+                elif habit_to_be_completed.get_periodicity() == "weekly":
 
                     next_week_start = last_completion_date + timedelta(days=(7 - last_completion_date.weekday()))
                     next_week_end = next_week_start + timedelta(days=6)
