@@ -1,7 +1,7 @@
-from models.habit import Habit
-from db_connection import DBConnection
+from src.models.habit import Habit
+from src.db_connection import DBConnection
 from datetime import datetime, timedelta
-from exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
+from src.exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
 
 
 class HabitManager:
@@ -52,7 +52,7 @@ class HabitManager:
             return Habit(result[2], result[3], result[0], result[4], completion_dates, result[5], result[6])
         
         else:
-            raise HabitNotFoundException("-")
+            return None
 
     
 
@@ -218,9 +218,3 @@ class HabitManager:
 
 
 
-
-        
-
-db = DBConnection("../db/habit_tracker.db")
-h_manager = HabitManager(db)
-print(h_manager.get_habits())

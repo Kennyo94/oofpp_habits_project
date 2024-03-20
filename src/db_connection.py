@@ -81,4 +81,26 @@ class DBConnection:
         # Commit changes and close connection
         self.connection.commit()
         self.disconnect()
+
+    def delete_tables(self):
+        with sqlite3.connect(self.db_file) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            tables = cursor.fetchall()
+            for table in tables:
+                if table[0] != "sqlite_sequence":
+                    cursor.execute(f"DROP TABLE {table[0]}")
+
+    
+    def load_test_data(self):
+        with sqlite3.connect(self.db_file) as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO Users (username, created_at) VALUES (?, ?)", ('john_doe', '20-03-2024'))
+            user_id = cursor.execute("SELECT user_id FROM Users WHERE username = ?", ('john_doe',)).fetchone()[0]
+
+
+            cursor.executemany("INSERT INTO Habits (user_id, name, periodicity) VALUES (?, ?, ?)", [(user_id, 'Exercise', 'daily'), (user_id, 'Reading', 'weekly')])
+
+
+
     
