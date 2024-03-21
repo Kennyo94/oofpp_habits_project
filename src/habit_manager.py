@@ -52,7 +52,7 @@ class HabitManager:
         """
         self.db = dbconnection
 
-    def get_habits(self):
+    def get_habits(self) -> list:
         """
         Retrieves all habits from the database.
 
@@ -76,7 +76,7 @@ class HabitManager:
             return habits
         return []
 
-    def get_habit_by_id(self, habit_id):
+    def get_habit_by_id(self, habit_id) -> Habit:
         """
         Retrieves a habit from the database by its unique identifier.
 
@@ -108,7 +108,7 @@ class HabitManager:
 
 
     
-    def get_habit_by_name(self, name):
+    def get_habit_by_name(self, name) -> Habit:
         """
         Retrieves a habit from the database by its name.
 
@@ -135,7 +135,7 @@ class HabitManager:
 
     
 
-    def get_habits_from_user(self, user_id):
+    def get_habits_from_user(self, user_id) -> list:
         """
         Retrieves all habits associated with a particular user from the database.
 
@@ -165,7 +165,7 @@ class HabitManager:
         
         return []
     
-    def get_habit_from_user_by_id(self, user_id, habit_id):
+    def get_habit_from_user_by_id(self, user_id, habit_id) -> Habit:
         """
         Retrieves a habit associated with a particular user by its unique identifier.
 
@@ -243,7 +243,7 @@ class HabitManager:
 
 
 
-    def delete_habit(self, habit_id):
+    def delete_habit(self, habit_id) -> Habit:
         """
         Deletes a habit from the database by its unique identifier.
 

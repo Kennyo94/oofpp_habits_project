@@ -46,7 +46,7 @@ class User:
         self.user_id = user_id
         self.created_at = created_at
 
-    def get_user_id(self):
+    def get_user_id(self) -> int:
         """
         Returns the unique identifier of the user.
 
@@ -57,7 +57,7 @@ class User:
         """
         return self.user_id
 
-    def get_username(self):
+    def get_username(self) -> str:
         """
         Returns the username of the user.
 
@@ -68,7 +68,7 @@ class User:
         """
         return self.username
     
-    def get_created_at(self):
+    def get_created_at(self) -> str:
         """
         Returns the creation date of the user account.
 

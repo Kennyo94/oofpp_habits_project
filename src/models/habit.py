@@ -78,31 +78,31 @@ class Habit:
         self.current_streak = current_streak
         self.longest_streak = longest_streak
 
-    def get_habit_id(self):
+    def get_habit_id(self) -> int:
         """Returns the unique identifier of the habit."""
         return self.habit_id
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Returns the name of the habit."""
         return self.name
     
-    def get_periodicity(self):
+    def get_periodicity(self) -> str:
         """Returns the habit's periodicity."""
         return self.periodicity
     
-    def get_creation_date(self):
+    def get_creation_date(self) -> str:
         """Returns the date the habit was created."""
         return self.creation_date
     
-    def get_completion_history(self):
+    def get_completion_history(self) -> list:
         """Returns a list of dates when the habit was completed."""
         return self.completion_history
     
-    def get_current_streak(self):
+    def get_current_streak(self) -> int:
         """Returns the current streak of habit completion."""
         return self.current_streak
     
-    def get_longest_streak(self):
+    def get_longest_streak(self) -> int:
         """Returns the longest streak of habit completion."""
         return self.longest_streak
     

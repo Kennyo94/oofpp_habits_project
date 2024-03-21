@@ -55,7 +55,7 @@ class DBConnection:
             self.connection.close()
             self.connection = None
 
-    def execute_query(self, query, params=""):
+    def execute_query(self, query, params="") -> sqlite3.Cursor:
         """
         Executes a SQL query using the open connection.
 
@@ -76,7 +76,7 @@ class DBConnection:
         cursor.execute(query, params)
         return cursor
 
-    def get_last_row_id(self):
+    def get_last_row_id(self) -> int:
         """
         Returns the row ID of the last row inserted into the database.
 

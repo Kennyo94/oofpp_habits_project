@@ -162,7 +162,7 @@ class UserManager:
             raise UserAlreadyExistsException(user.get_username())
 
     
-    def delete_user_by_username(self, username):
+    def delete_user_by_username(self, username) -> User:
         """
         Deletes a user from the database by their username.
 
@@ -187,12 +187,12 @@ class UserManager:
             query = "DELETE FROM Users WHERE username = ?"
             self.db.execute_query(query, (username,))
             self.db.commit_query()
-            return "SUCCESS"
+            return user_to_be_deleted
         else:
             raise UserNotFoundException(username)
         
 
-    def delete_user_by_id(self, user_id):
+    def delete_user_by_id(self, user_id) -> User:
         """
         Deletes a user from the database by their user ID.
 
@@ -217,7 +217,7 @@ class UserManager:
             query = "DELETE FROM Users WHERE user_id = ?"
             self.db.execute_query(query, (user_id,))
             self.db.commit_query()
-            return "SUCCESS"
+            return user_to_be_deleted
         else:
             raise UserNotFoundException(user_id)
 
