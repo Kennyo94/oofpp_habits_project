@@ -5,29 +5,96 @@ from src.exceptions import HabitNotFoundException, HabitAlreadyExistsException, 
 
 
 class HabitManager:
+    """
+    A class to manage habits within a database.
+
+    Attributes:
+    -----------
+    db : DBConnection
+        The database connection object used to interact with the database.
+
+    Methods:
+    --------
+    __init__(self, dbconnection):
+        Initializes the HabitManager with a database connection.
+    get_habits(self):
+        Retrieves all habits from the database.
+    get_habit_by_id(self, habit_id):
+        Retrieves a habit from the database by its unique identifier.
+    get_habit_by_name(self, name):
+        Retrieves a habit from the database by its name.
+    get_habits_from_user(self, user_id):
+        Retrieves all habits associated with a particular user from the database.
+    get_habit_from_user_by_id(self, user_id, habit_id):
+        Retrieves a habit associated with a particular user by its unique identifier.
+    add_habit(self, habit: Habit, user_id):
+        Adds a new habit to the database for a specific user.
+    delete_habit(self, habit_id):
+        Deletes a habit from the database by its unique identifier.
+    update_habit_name(self, habit_id, new_name):
+        Updates the name of a habit in the database.
+    update_habit_periodicity(self, habit_id, periodicity):
+        Updates the periodicity of a habit in the database.
+    update_streak(self, habit_id, new_current, new_longest):
+        Updates the streak of a habit in the database.
+    complete_habit(self, habit_id, date):
+        Marks a habit as completed for a particular date in the database.
+    """
 
     def __init__(self, dbconnection):
+        """
+        Constructs a HabitManager object with a database connection.
+
+        Parameters:
+        -----------
+        dbconnection : DBConnection
+            The database connection object to be used for interacting with the database.
+        """
         self.db = dbconnection
 
     def get_habits(self):
+        """
+        Retrieves all habits from the database.
+
+        Returns:
+        --------
+        list
+            A list of Habit objects representing all habits stored in the database.
+        """
         habits = []
         query = "SELECT * FROM Habits"
         result = self.db.execute_query(query).fetchall()
-        
+
         if result is not None:
             for habit in result:
                 habit_id = habit[0]
                 completion_query = "SELECT completion_date FROM CompletionDates WHERE habit_id = ?"
                 cd = self.db.execute_query(completion_query, (habit_id, )).fetchall()
                 completion_dates = [str(dates[0]) for dates in cd]
-                h = Habit(habit[2],habit[3], habit[0], habit[4], completion_dates, habit[5], habit[6])
+                h = Habit(habit[2], habit[3], habit[0], habit[4], completion_dates, habit[5], habit[6])
                 habits.append(h)
-
             return habits
-        
         return []
-    
+
     def get_habit_by_id(self, habit_id):
+        """
+        Retrieves a habit from the database by its unique identifier.
+
+        Parameters:
+        -----------
+        habit_id : int
+            The unique identifier of the habit to retrieve.
+
+        Returns:
+        --------
+        Habit or None
+            A Habit object representing the retrieved habit if found, otherwise None.
+        
+        Raises:
+        -------
+        HabitNotFoundException
+            If no habit with the given habit_id is found in the database.
+        """
         query = "SELECT * FROM Habits WHERE habit_id = ?"
         result = self.db.execute_query(query, (habit_id, )).fetchone()
 
@@ -36,12 +103,25 @@ class HabitManager:
             cd = self.db.execute_query(completion_query, (result[0], )).fetchall()
             completion_dates = [str(dates[0]) for dates in cd]
             return Habit(result[2], result[3], result[0], result[4], completion_dates, result[5], result[6])
-
         else:
             raise HabitNotFoundException(habit_id)
 
+
     
     def get_habit_by_name(self, name):
+        """
+        Retrieves a habit from the database by its name.
+
+        Parameters:
+        -----------
+        name : str
+            The name of the habit to retrieve.
+
+        Returns:
+        --------
+        Habit or None
+            A Habit object representing the retrieved habit if found, otherwise None.
+        """
         query = "SELECT * FROM Habits WHERE name = ?"
         result = self.db.execute_query(query, (name, )).fetchone()
 
@@ -50,13 +130,25 @@ class HabitManager:
             cd = self.db.execute_query(completion_query, (result[0], )).fetchall()
             completion_dates = [str(dates[0]) for dates in cd]
             return Habit(result[2], result[3], result[0], result[4], completion_dates, result[5], result[6])
-        
         else:
             return None
 
     
 
     def get_habits_from_user(self, user_id):
+        """
+        Retrieves all habits associated with a particular user from the database.
+
+        Parameters:
+        -----------
+        user_id : int
+            The unique identifier of the user whose habits are to be retrieved.
+
+        Returns:
+        --------
+        list
+            A list of Habit objects representing the habits associated with the specified user.
+        """
         habits = []
         query = "SELECT * FROM Habits WHERE user_id = ?"
         result = self.db.execute_query(query, (user_id, )).fetchall()
@@ -74,6 +166,26 @@ class HabitManager:
         return []
     
     def get_habit_from_user_by_id(self, user_id, habit_id):
+        """
+        Retrieves a habit associated with a particular user by its unique identifier.
+
+        Parameters:
+        -----------
+        user_id : int
+            The unique identifier of the user.
+        habit_id : int
+            The unique identifier of the habit to retrieve.
+
+        Returns:
+        --------
+        Habit or None
+            A Habit object representing the retrieved habit if found, otherwise None.
+        
+        Raises:
+        -------
+        HabitNotFoundException
+            If no habit with the given habit_id associated with the specified user_id is found in the database.
+        """
         query = "SELECT * FROM Habits WHERE user_id = ? AND habit_id = ?"
         result = self.db.execute_query(query, (user_id, habit_id, )).fetchone()
 
@@ -88,7 +200,21 @@ class HabitManager:
 
 
     def add_habit(self, habit: Habit, user_id):
+        """
+        Adds a new habit to the database for a specific user.
 
+        Parameters:
+        -----------
+        habit : Habit
+            The Habit object representing the habit to be added.
+        user_id : int
+            The unique identifier of the user associated with the new habit.
+
+        Raises:
+        -------
+        HabitAlreadyExistsException
+            If a habit with the same name already exists for the specified user.
+        """
         name = habit.get_name()
         periodicity = habit.get_periodicity()
         creation_date = habit.get_creation_date()
@@ -118,6 +244,24 @@ class HabitManager:
 
 
     def delete_habit(self, habit_id):
+        """
+        Deletes a habit from the database by its unique identifier.
+
+        Parameters:
+        -----------
+        habit_id : int
+            The unique identifier of the habit to be deleted.
+
+        Returns:
+        --------
+        Habit
+            The Habit object representing the deleted habit.
+
+        Raises:
+        -------
+        HabitNotFoundException
+            If no habit with the given habit_id is found in the database.
+        """
         habit_to_be_deleted = self.get_habit_by_id(habit_id)
         if habit_to_be_deleted is not None:
             query = "DELETE FROM Habits WHERE habit_id = ?"
@@ -134,7 +278,21 @@ class HabitManager:
         
 
     def update_habit_name(self, habit_id, new_name):
+        """
+        Updates the name of a habit in the database.
 
+        Parameters:
+        -----------
+        habit_id : int
+            The unique identifier of the habit to be updated.
+        new_name : str
+            The new name to assign to the habit.
+
+        Raises:
+        -------
+        HabitNotFoundException
+            If no habit with the given habit_id is found in the database.
+        """
         habit_to_be_updated = self.get_habit_by_id(habit_id)
 
         if habit_to_be_updated is not None:
@@ -149,20 +307,51 @@ class HabitManager:
        
 
     def update_habit_periodicity(self, habit_id, periodicity):
+        """
+        Updates the periodicity of a habit in the database.
 
-            habit_to_be_updated = self.get_habit_by_id(habit_id)
+        Parameters:
+        -----------
+        habit_id : int
+            The unique identifier of the habit to be updated.
+        periodicity : str
+            The new periodicity to assign to the habit.
 
-            if habit_to_be_updated is not None:
-                query = "UPDATE Habits SET periodicity = ? WHERE habit_id = ?"
-                self.db.execute_query(query, (periodicity, habit_id, ))
-                self.db.commit_query()
-                return
+        Raises:
+        -------
+        HabitNotFoundException
+            If no habit with the given habit_id is found in the database.
+        """
+        habit_to_be_updated = self.get_habit_by_id(habit_id)
 
-            if habit_to_be_updated is None:
-                raise HabitNotFoundException(habit_id)
+        if habit_to_be_updated is not None:
+            query = "UPDATE Habits SET periodicity = ? WHERE habit_id = ?"
+            self.db.execute_query(query, (periodicity, habit_id, ))
+            self.db.commit_query()
+            return
+
+        if habit_to_be_updated is None:
+            raise HabitNotFoundException(habit_id)
             
 
     def update_streak(self, habit_id, new_current, new_longest):
+        """
+        Updates the streak of a habit in the database.
+
+        Parameters:
+        -----------
+        habit_id : int
+            The unique identifier of the habit whose streak is to be updated.
+        new_current : int
+            The new current streak value.
+        new_longest : int
+            The new longest streak value.
+
+        Raises:
+        -------
+        HabitNotFoundException
+            If no habit with the given habit_id is found in the database.
+        """
         query = "UPDATE Habits SET current_streak = ?, longest_streak = ? WHERE habit_id = ?"
         self.db.execute_query(query, (new_current, new_longest, habit_id, ))
         self.db.commit_query()
@@ -170,6 +359,21 @@ class HabitManager:
 
 
     def complete_habit(self, habit_id, date):
+        """
+        Marks a habit as completed for a particular date in the database. It also updates the streak accordingly.
+
+        Parameters:
+        -----------
+        habit_id : int
+            The unique identifier of the habit to mark as completed.
+        date : str
+            The date when the habit was completed in 'YYYY-MM-DD' format.
+
+        Raises:
+        -------
+        HabitNotFoundException
+            If no habit with the given habit_id is found in the database.
+        """
         habit_to_be_completed = self.get_habit_by_id(habit_id)
 
         if habit_to_be_completed is not None:
