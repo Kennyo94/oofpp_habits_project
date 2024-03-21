@@ -5,9 +5,8 @@ from src.user_manager import UserManager
 from src.models.habit import Habit
 from src.models.user import User
 from src.exceptions import HabitNotFoundException
-from datetime import datetime, timedelta
+from datetime import datetime
 import sqlite3
-
 
 
 user_1 = User("john_doe", 1, "2023-10-09")
