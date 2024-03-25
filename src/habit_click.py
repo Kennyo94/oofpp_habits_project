@@ -1,8 +1,11 @@
 import click 
+from rich.console import Console
+from rich.table import Table
 from user_manager import UserManager
 from habit_manager import HabitManager
 from db_connection import DBConnection
 from exceptions import *
+from datetime import datetime
 db = DBConnection("../db/habit_tracker.db")
 
 u_manager = UserManager(db)
@@ -82,8 +85,6 @@ def delete_user(name, id):
 
 
 
-import click
-
 @cli.command()
 @click.option('--name', '-n',type=str, prompt='Enter habit name', help='Name of the habit.')
 @click.option('--periodicity', '-p', type=click.Choice(['daily', 'weekly']), prompt='Enter habit periodicity', help='Periodicity of the habit.')
@@ -103,6 +104,130 @@ def create_habit(name, periodicity, user_id):
         click.echo("Habit created successfully.")
     except (UserNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException) as e:
         click.echo(f"Error: {str(e)}")
+
+
+
+@cli.command()
+@click.option('--user_id', '-i', type=int, help='User ID to get habits.')
+def get_habits(user_id):
+    """
+    Get the habits of a user by user ID.
+
+    Args:
+        user_id (int): The ID of the user.
+    """
+    try:
+        if user_id:
+            habits = h_manager.get_habits_from_user(user_id)
+        else:
+            raise click.BadParameter("User ID must be provided.")
+
+        if habits:
+            display_habits_table(habits)
+        else:
+            click.echo("No habits found for the specified user.")
+
+    except UserNotFoundException as e:
+        click.echo(f"Error: {str(e)}")
+
+
+
+@cli.command()
+@click.option('--user_id', type=int, help='ID of the user completing the habit.')
+@click.option('--habit_id', type=int, help='ID of the habit to complete.')
+@click.option('--habit_name', help='Name of the habit to complete.')
+def complete_habit(user_id, habit_id, habit_name):
+    """
+    Complete a habit by its ID or name.
+
+    Args:
+        user_id (int): ID of the user completing the habit.
+        habit_id (int): ID of the habit to complete.
+        habit_name (str): Name of the habit to complete.
+    """
+    try:
+        if not user_id:
+            raise click.BadParameter("User ID must be provided.")
+        if not habit_id and not habit_name:
+            display_habits_table(h_manager.get_habits_from_user(user_id))
+            habit_choice = int(input("Please Select Habit by ID: "))
+            h_manager.complete_habit(habit_choice, datetime.now())
+            click.echo("Habit completed successfully.")
+        if habit_id:
+            h_manager.complete_habit(habit_id, datetime.now())
+            click.echo("Habit completed successfully.")
+        elif habit_name:
+            new_habit_id = h_manager.get_habit_by_name(habit_name).get_habit_id()
+            h_manager.complete_habit(new_habit_id, datetime.now())
+            click.echo("Habit completed successfully.")
+
+    except HabitNotFoundException as e:
+        click.echo(f"Error: {str(e)}")
+
+
+
+
+@cli.command()
+@click.option('--user_id', type=int, help='The ID of the user who owns the habit.')
+@click.option('--habit_id', type=int, help='The ID of the habit to update.')
+@click.option('--new_name', type=str, help='The new name for the habit.')
+def update_habit_name(user_id, habit_id, new_name):
+    """
+    Update the name of a habit.
+    """
+    try:
+        if h_manager.get_habit_from_user_by_id(user_id, habit_id):
+            h_manager.update_habit_name(habit_id, new_name)
+            click.echo("Habit name updated successfully.")
+    except HabitNotFoundException as e:
+        click.echo(f"Error: {str(e)}")
+
+@cli.command()
+@click.option('--user_id', type=int, help='The ID of the user who owns the habit.')
+@click.option('--habit_id', type=int, help='The ID of the habit to update.')
+@click.option('--new_periodicity', type=str, help='The new periodicity for the habit.')
+def update_habit_periodicity(user_id, habit_id, new_periodicity):
+    """
+    Update the periodicity of a habit.
+    """
+    try:
+        if h_manager.get_habit_from_user_by_id(user_id, habit_id):
+            h_manager.update_habit_periodicity(habit_id, new_periodicity)
+        click.echo("Habit periodicity updated successfully.")
+    except HabitNotFoundException as e:
+        click.echo(f"Error: {str(e)}")
+
+
+
+def display_habits_table(habits):
+    """
+    Display habits in a table using Rich library.
+
+    Args:
+        habits (list): List of Habit objects.
+    """
+    console = Console()
+
+    table = Table(title="User Habits")
+    table.add_column("Habit ID", style="white", justify="left")
+    table.add_column("Habit Name", style="cyan", justify="left")
+    table.add_column("Periodicity", style="magenta", justify="center")
+    table.add_column("Current Streak", style="yellow", justify="center")
+    table.add_column("Longest Streak", style="green", justify="center")
+
+    for habit in habits:
+        table.add_row(
+            str(habit.get_habit_id()),
+            habit.get_name(),
+            habit.get_periodicity(),
+            str(habit.get_current_streak()),
+            str(habit.get_longest_streak())
+        )
+
+    console.print(table)
+
+
+    
 
 
 
