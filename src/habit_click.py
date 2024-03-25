@@ -1,13 +1,17 @@
 import click 
 from rich.console import Console
 from rich.table import Table
-from user_manager import UserManager
-from habit_manager import HabitManager
-from db_connection import DBConnection
-from exceptions import *
+from src.user_manager import UserManager
+from src.habit_manager import HabitManager
+from src.db_connection import DBConnection
+from src.exceptions import *
+from src.analytics import get_all_tracked_habits, get_habits_by_periodicity, get_longest_run_streak_all_habits, get_longest_run_streak_for_habit 
 from datetime import datetime
-db = DBConnection("../db/habit_tracker.db")
 
+# Create a DB connection
+db = DBConnection("db/habit_tracker.db")
+
+# Initialize user and habit managers
 u_manager = UserManager(db)
 h_manager = HabitManager(db)
 
@@ -23,7 +27,7 @@ def create_user(username):
     """
     Create a new user in the HabitTracker system.
 
-    Args:
+    Paramters:
         username (str): The username of the new user to be created.
     """
     try:
@@ -40,7 +44,7 @@ def select_user(name, id):
     """
     Select an existing user in the HabitTracker system.
 
-    Args:
+    Paramters:
         name (str): The username of the user to select.
         id (int): The user ID of the user to select.
     """
@@ -67,7 +71,7 @@ def delete_user(name, id):
     """
     Delete an existing user from the HabitTracker system.
 
-    Args:
+    Paramters:
         name (str): The username of the user to delete.
         id (int): The user ID of the user to delete.
     """
@@ -97,7 +101,7 @@ def create_habit(name, periodicity, user_id):
     """
     Create a new habit and associate it with a user.
 
-    Args:
+    Paramters:
         name (str): The name of the habit.
         periodicity (str): The periodicity of the habit (daily or weekly).
         user_id (int): The user ID associated with the habit.
@@ -117,7 +121,7 @@ def get_habits(user_id):
     """
     Get the habits of a user by user ID.
 
-    Args:
+    Paramters:
         user_id (int): The ID of the user.
     """
     try:
@@ -144,7 +148,7 @@ def complete_habit(user_id, habit_id, habit_name):
     """
     Complete a habit by its ID or name.
 
-    Args:
+    Paramters:
         user_id (int): ID of the user completing the habit.
         habit_id (int): ID of the habit to complete.
         habit_name (str): Name of the habit to complete.
@@ -169,8 +173,6 @@ def complete_habit(user_id, habit_id, habit_name):
         click.echo(f"Error: {str(e)}")
 
 
-
-
 @cli.command()
 @click.option('--user_id', type=int, help='The ID of the user who owns the habit.')
 @click.option('--habit_id', type=int, help='The ID of the habit to update.')
@@ -178,6 +180,11 @@ def complete_habit(user_id, habit_id, habit_name):
 def update_habit_name(user_id, habit_id, new_name):
     """
     Update the name of a habit.
+
+    Paramters:
+        user_id (int): The ID of the user who owns the habit.
+        habit_id (int): The ID of the habit to update.
+        new_name (str): The new name for the habit.
     """
     try:
         if h_manager.get_habit_from_user_by_id(user_id, habit_id):
@@ -193,6 +200,11 @@ def update_habit_name(user_id, habit_id, new_name):
 def update_habit_periodicity(user_id, habit_id, new_periodicity):
     """
     Update the periodicity of a habit.
+
+    Paramters:
+        user_id (int): The ID of the user who owns the habit.
+        habit_id (int): The ID of the habit to update.
+        new_periodicity (str): The new periodicity for the habit.
     """
     try:
         if h_manager.get_habit_from_user_by_id(user_id, habit_id):
@@ -201,13 +213,106 @@ def update_habit_periodicity(user_id, habit_id, new_periodicity):
     except HabitNotFoundException as e:
         click.echo(f"Error: {str(e)}")
 
+@cli.command()
+@click.option('--user_id', type=int, help='The ID of the user who owns the habit.')
+@click.option('--habit_id', type=int, help='The ID of the habit to view.')
+def view_habit(user_id, habit_id):
+    """
+    View detailed habit information.
+
+    Paramters:
+        user_id (int): The ID of the user who owns the habit.
+        habit_id (int): The ID of the habit to view.
+    """
+    try: 
+        habit = h_manager.get_habit_from_user_by_id(user_id, habit_id)
+        display_habit(habit)
+    except HabitNotFoundException as e:
+        click.echo(f"Error: {str(e)}")
+
+
+@cli.command()
+@click.option('--habit_id','-id', type=int, prompt='Enter habit ID', help='ID of the habit to delete.')
+@click.confirmation_option(prompt='Are you sure you want to delete this habit?')
+def delete_habit(habit_id):
+    """
+    Delete a habit by its ID.
+
+    Paramters:
+        habit_id (int): The ID of the habit to delete.
+    """
+    try:
+        h_manager.delete_habit(habit_id)
+        click.echo("Habit deleted successfully.")
+    except HabitNotFoundException as e:
+        click.echo(f"Error: {str(e)}")
+
+
+@cli.command()
+def analytics_get_habits():
+    """
+    Return a list of all currently tracked habits.
+
+    This command retrieves all currently tracked habits from the Habit Manager
+    and displays them in a table.
+    """
+    habits = get_all_tracked_habits(h_manager)
+    display_habits_table(habits)
+
+@cli.command()
+@click.option('--periodicity','-p', type=str, help='Filter habits by periodicity')
+def analytics_habits_periodicity(periodicity):
+    """
+    Return a list of all habits with the same periodicity.
+
+    Args:
+        periodicity (str): The periodicity to filter habits by.
+
+    This command retrieves habits with the specified periodicity from the Habit Manager
+    and displays them in a table.
+    """
+    habits = get_habits_by_periodicity(h_manager, periodicity)
+    display_habits_table(habits)
+
+
+@cli.command()
+def analytics_longest_streak():
+    """
+    Return the longest run streak of all defined habits.
+
+    This command calculates the longest run streak among all defined habits
+    and displays the habit with its corresponding streak dates in a table.
+    """
+    habits = h_manager.get_habits()
+    streak = get_longest_run_streak_all_habits(habits)
+    display_habit_table(streak[0])
+    click.echo(f"Longest Streak Dates: {streak[1]}")
+
+
+@cli.command()
+@click.option('--habit_id','-id', type=str, help='Filter habits by periodicity')
+def analytics_habit_longest_streak(habit_id):
+    """
+    Return the longest run streak for a given habit.
+
+    Args:
+        habit_id (str): The ID of the habit to retrieve the longest streak for.
+
+    This command calculates the longest run streak for the specified habit
+    and displays it.
+    """
+    habit = h_manager.get_habit_by_id(habit_id)
+    streak = get_longest_run_streak_for_habit(habit)
+    click.echo(f"Longest Streak: {streak}")
+
+
 
 
 def display_habits_table(habits):
     """
     Display habits in a table using Rich library.
 
-    Args:
+    Paramters:
         habits (list): List of Habit objects.
     """
     console = Console()
@@ -231,11 +336,59 @@ def display_habits_table(habits):
     console.print(table)
 
 
-    
+def display_habit_table(habit):
+    """
+    Display information about a single habit without completion dates.
+
+    Paramters:
+        habit (Habit): The Habit object to display information about.
+    """    
+    console = Console()
+
+    # Create a table for habit information
+    habit_table = Table(title="Habit Information", style="bold blue")
+    habit_table.add_column("Attribute", style="bold")
+    habit_table.add_column("Value", style="bold")
+    habit_table.add_row("Habit ID", str(habit.get_habit_id()))
+    habit_table.add_row("Name", habit.get_name())
+    habit_table.add_row("Periodicity", habit.get_periodicity())
+    habit_table.add_row("Creation Date", habit.get_creation_date())
+    habit_table.add_row("Current Streak", str(habit.get_current_streak()), style="green")
+    habit_table.add_row("Longest Streak", str(habit.get_longest_streak()), style="green")
+
+    # Print the tables
+    console.print(habit_table)
+
+def display_habit(habit):
+    """
+    Display information about a single habit.
+
+    Paramters:
+        habit (Habit): The Habit object to display information about.
+    """    
+    console = Console()
+
+    # Create a table for habit information
+    habit_table = Table(title="Habit Information", style="bold blue")
+    habit_table.add_column("Attribute", style="bold")
+    habit_table.add_column("Value", style="bold")
+    habit_table.add_row("Habit ID", str(habit.get_habit_id()))
+    habit_table.add_row("Name", habit.get_name())
+    habit_table.add_row("Periodicity", habit.get_periodicity())
+    habit_table.add_row("Creation Date", habit.get_creation_date())
+    habit_table.add_row("Current Streak", str(habit.get_current_streak()), style="green")
+    habit_table.add_row("Longest Streak", str(habit.get_longest_streak()), style="green")
+
+    # Create a table for last 5 completion dates
+    completion_table = Table(title="Last 5 Completion Dates", style="bold blue")
+    completion_table.add_column("Date", style="bold")
+    for date in habit.get_completion_history()[-5:]:
+        completion_table.add_row(str(date))
+
+    # Print the tables
+    console.print(habit_table)
+    console.print(completion_table)
 
 
 
 
-
-if __name__ == "__main__":
-    cli()

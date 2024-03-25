@@ -1,7 +1,7 @@
-from models.habit import Habit
-from db_connection import DBConnection
+from src.models.habit import Habit
+from src.db_connection import DBConnection
 from datetime import datetime, timedelta
-from exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
+from src.exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
 
 
 class HabitManager:
@@ -243,6 +243,15 @@ class HabitManager:
 
 
     def add_habit_by_info(self, name, periodicity, user_id):
+        """
+        Create and add a new habit to the habit manager based on provided information.
+
+        Parameters:
+            name (str): The name of the habit.
+            periodicity (str): The periodicity of the habit ('daily' or 'weekly').
+            user_id (int): The ID of the user associated with the habit.
+
+        """
         habit = Habit(name, periodicity)
         self.add_habit(habit, user_id)
 
