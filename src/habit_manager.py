@@ -1,7 +1,7 @@
-from src.models.habit import Habit
-from src.db_connection import DBConnection
+from models.habit import Habit
+from db_connection import DBConnection
 from datetime import datetime, timedelta
-from src.exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
+from exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
 
 
 class HabitManager:
@@ -198,7 +198,6 @@ class HabitManager:
             raise HabitNotFoundException(habit_id)
         
 
-
     def add_habit(self, habit: Habit, user_id):
         """
         Adds a new habit to the database for a specific user.
@@ -242,6 +241,10 @@ class HabitManager:
             raise HabitAlreadyExistsException(name)
 
 
+
+    def add_habit_by_info(self, name, periodicity, user_id):
+        habit = Habit(name, periodicity)
+        self.add_habit(habit, user_id)
 
     def delete_habit(self, habit_id) -> Habit:
         """

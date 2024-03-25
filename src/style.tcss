@@ -1,0 +1,66 @@
+
+Screen {
+    layout: vertical;
+    padding: 2;
+}
+
+
+Horizontal {
+    width: 100%;
+    height: 91%;
+    layout: horizontal;
+}
+
+Static {
+    content-align: center middle;
+    height: 1fr;
+}
+
+Input {
+    height: 3;
+}
+
+DisplayInfo {
+    width: 100%;
+    height: 1fr;
+    padding: 1;
+    background: green;
+}
+
+DisplayMenu {
+    width: 100%;
+    height: 1fr;
+    padding: 1;
+    background: pink;
+}
+
+.displaylabel {
+    width: 100%;
+    height: 1fr;
+}
+
+
+Header {
+    background: blue;
+    padding-left: 1;
+    padding-right: 1;
+}
+
+Label {
+    height: 10;
+    padding-left: 2;
+    padding-right: 2;
+}
+
+Button {
+    width: 100%;
+    margin-bottom: 1;
+    background: gray;
+}
+
+Footer {
+    background: blue;
+    padding-left: 1;
+    padding-right: 1;
+}
+

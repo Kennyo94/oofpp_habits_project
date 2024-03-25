@@ -1,7 +1,7 @@
-from src.models.user import User
-from src.db_connection import DBConnection
+from models.user import User
+from db_connection import DBConnection
 from datetime import datetime
-from src.exceptions import UserNotFoundException, UsernameAlreadyExistsException, UserAlreadyExistsException
+from exceptions import UserNotFoundException, UsernameAlreadyExistsException, UserAlreadyExistsException
 
 
 class UserManager:
