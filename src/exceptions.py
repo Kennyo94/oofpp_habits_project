@@ -177,3 +177,13 @@ class UsernameAlreadyExistsException(Exception):
         self.username = username
         self.message = f"Username '{self.username}' already exists"
         super().__init__(self.message)
+
+
+class UsernameAndIDMismatchException(Exception):
+    """
+    Exception raised when the provided username and user ID don't match.
+    """
+    def __init__(self, username, user_id):
+        self.username = username
+        self.user_id = user_id
+        super().__init__(f"Username '{username}' does not match User ID '{user_id}'.")

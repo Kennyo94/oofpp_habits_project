@@ -73,16 +73,20 @@ def delete_user(name, id):
     """
     try:
         if id:
-            u_manager.delete_user_by_id(id)
+            username = input("Confirm username: ")
+            if u_manager.get_user_by_name(username).get_user_id() == id:
+                u_manager.delete_user_by_id(id)
+            else:
+                click.echo("Error: User ID and Username does not match")
+                return 
         elif name:
             u_manager.delete_user_by_username(name)
         else:
             raise click.BadParameter("Please provide either --name or --id option.")
-
         click.echo("User deleted successfully.")
     except (UserNotFoundException, ValueError) as e:
         click.echo(f"Error: {str(e)}")
-
+    
 
 
 @cli.command()
