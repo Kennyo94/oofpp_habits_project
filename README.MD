@@ -8,17 +8,29 @@ To install Habit Tracker, follow these steps:
 
 1. Clone the repository to your local machine:
 
-```git clone https://github.com/your-username/habit-tracking-app.git```
+```git clone https://github.com/Kennyo94/habit-tracking-app.git```
 
 
 2. Navigate to the project directory:
 
 ```cd habit-tracker```
 
-3. Install the required Python packages using pip:
+
+3. Create and activate a virtual environment using venv (optional but recommended):
+
+On Unix or MacOS:
+
+```python3 -m venv venv```
+```source venv/bin/activate```
+
+On Windows:
+
+```python -m venv venv```
+```.\venv\Scripts\activate```
+
+4. Install the required Python packages using pip:
 
 ```pip install -r requirements.txt```
-
 
 ## Functionalities
 
@@ -47,10 +59,12 @@ To use Habit Tracker, follow these steps:
 
 2. Run the CLI application by executing the following command:
 
-python habitcli.py
+```python main.py```
 
-3. Follow the prompts and commands provided by the CLI to create users, manage habits, view analytics, and more.
+3. Follow the prompts and commands provided by the CLI to create users, manage habits, view analytics, and more. To see all possible commands type:
+
+```python main.py --help```
 
 
-## WRITE README WITH DOCUMENTATION AND HOW TO INSTALL 
+
 ## POPULATE DATABASE WITH MOCK DATA FOR 4 WEEKS. USE GPT FOR THAT PROLLY
