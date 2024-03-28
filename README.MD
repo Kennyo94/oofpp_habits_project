@@ -34,7 +34,7 @@ On Windows:
 
 ## Functionalities
 
-Habit Tracker offers the following functionalities:
+HabitTracker offers the following functionalities:
 
 - **Create User**: Create a new user in the system.
 - **Select User**: Select an existing user to perform actions.
@@ -53,7 +53,7 @@ Habit Tracker offers the following functionalities:
 
 ## Usage
 
-To use Habit Tracker, follow these steps:
+To use HabitTracker, follow these steps:
 
 1. Navigate to the project directory in your terminal.
 
