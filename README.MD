@@ -1,10 +1,10 @@
-# Habit Tracker
+# Habit Tracking App
 
-Welcome to Habit Tracker, a simple command-line interface (CLI) application designed to help you track and analyze your habits effectively. Whether you're aiming to exercise more regularly, stay organized, or practice mindfulness, Habit Tracker provides you with the tools you need to stay accountable and achieve your goals.
+Welcome to HabitTracker, a simple command-line interface (CLI) application designed to help you track and analyze your habits effectively. Whether you're aiming to exercise more regularly, stay organized, or practice mindfulness, HabitTracker provides you with the tools you need to stay accountable and achieve your goals.
 
 ## Installation
 
-To install Habit Tracker, follow these steps:
+To install HabitTracker, follow these steps:
 
 1. Clone the repository to your local machine:
 
@@ -34,7 +34,7 @@ On Windows:
 
 ## Functionalities
 
-Habit Tracker offers the following functionalities:
+HabitTracker offers the following functionalities:
 
 - **Create User**: Create a new user in the system.
 - **Select User**: Select an existing user to perform actions.
@@ -53,7 +53,7 @@ Habit Tracker offers the following functionalities:
 
 ## Usage
 
-To use Habit Tracker, follow these steps:
+To use HabitTracker, follow these steps:
 
 1. Navigate to the project directory in your terminal.
 
