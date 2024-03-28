@@ -66,5 +66,3 @@ To use Habit Tracker, follow these steps:
 ```python main.py --help```
 
 
-
-## POPULATE DATABASE WITH MOCK DATA FOR 4 WEEKS. USE GPT FOR THAT PROLLY
