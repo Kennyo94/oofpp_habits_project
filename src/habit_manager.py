@@ -29,6 +29,8 @@ class HabitManager:
         Retrieves a habit associated with a particular user by its unique identifier.
     add_habit(self, habit: Habit, user_id):
         Adds a new habit to the database for a specific user.
+    add_habit_by_info(self, name, periodicity, user_id):
+        Adds a new habit to the database for a specific user by its name and perdiocitiy.
     delete_habit(self, habit_id):
         Deletes a habit from the database by its unique identifier.
     update_habit_name(self, habit_id, new_name):

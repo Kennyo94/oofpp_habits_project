@@ -1,3 +1,56 @@
 # Habit Tracker
 
 Welcome to Habit Tracker, a simple command-line interface (CLI) application designed to help you track and analyze your habits effectively. Whether you're aiming to exercise more regularly, stay organized, or practice mindfulness, Habit Tracker provides you with the tools you need to stay accountable and achieve your goals.
+
+## Installation
+
+To install Habit Tracker, follow these steps:
+
+1. Clone the repository to your local machine:
+
+git clone https://github.com/your-username/habit-tracker.git
+
+
+2. Navigate to the project directory:
+
+cd habit-tracker
+
+3. Install the required Python packages using pip:
+
+pip install -r requirements.txt
+
+
+## Functionalities
+
+Habit Tracker offers the following functionalities:
+
+- **Create User**: Create a new user in the system.
+- **Select User**: Select an existing user to perform actions.
+- **Delete User**: Delete an existing user from the system.
+- **Create Habit**: Create a new habit and associate it with a user.
+- **Get Habits**: Get the habits of a user.
+- **Complete Habit**: Mark a habit as completed.
+- **Update Habit Name**: Update the name of a habit.
+- **Update Habit Periodicity**: Update the periodicity of a habit.
+- **View Habit**: View detailed information about a habit.
+- **Analytics**: Retrieve analytics data, including:
+    - List of all currently tracked habits.
+    - List of habits with the same periodicity.
+    - Longest run streak of all defined habits.
+    - Longest run streak for a given habit.
+
+## Usage
+
+To use Habit Tracker, follow these steps:
+
+1. Navigate to the project directory in your terminal.
+
+2. Run the CLI application by executing the following command:
+
+python habitcli.py
+
+3. Follow the prompts and commands provided by the CLI to create users, manage habits, view analytics, and more.
+
+
+## WRITE README WITH DOCUMENTATION AND HOW TO INSTALL 
+## POPULATE DATABASE WITH MOCK DATA FOR 4 WEEKS. USE GPT FOR THAT PROLLY
