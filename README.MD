@@ -8,16 +8,16 @@ To install Habit Tracker, follow these steps:
 
 1. Clone the repository to your local machine:
 
-git clone https://github.com/your-username/habit-tracker.git
+```git clone https://github.com/your-username/habit-tracking-app.git```
 
 
 2. Navigate to the project directory:
 
-cd habit-tracker
+```cd habit-tracker```
 
 3. Install the required Python packages using pip:
 
-pip install -r requirements.txt
+```pip install -r requirements.txt```
 
 
 ## Functionalities
