@@ -1,5 +1,4 @@
 from src.models.habit import Habit
-from src.db_connection import DBConnection
 from datetime import datetime, timedelta
 from src.exceptions import HabitNotFoundException, HabitAlreadyExistsException, InvalidPeriodicityException
 
