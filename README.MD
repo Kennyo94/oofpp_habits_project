@@ -32,6 +32,11 @@ On Windows:
 
 ```pip install -r requirements.txt```
 
+5. Run Unit Tests 
+
+```cd tests```
+```pytest```
+
 ## Functionalities
 
 HabitTracker offers the following functionalities:
